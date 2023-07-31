@@ -20,6 +20,10 @@ public class AnnotationScannerTest {
         AnnotationScanner annotationScanner = new AnnotationScanner(rootPackage);
         List<Class<?>> classes = annotationScanner.scanClass(TestAnnotation.class);
 
+        for (Class<?> clazz : classes) {
+            System.out.println(clazz.getName());
+        }
+
         // then
         assertThat(classes).isNotNull().isNotEmpty();
     }
