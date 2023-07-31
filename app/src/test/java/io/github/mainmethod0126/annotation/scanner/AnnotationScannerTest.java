@@ -1,12 +1,11 @@
-# annotation-scanner
+package io.github.mainmethod0126.annotation.scanner;
 
-It's a service that helps find specific annotations used in a project.
+import java.util.List;
 
-## Usage
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-### Example
-
-```java
+import static org.assertj.core.api.Assertions.*;
 
 public class AnnotationScannerTest {
 
@@ -26,6 +25,3 @@ public class AnnotationScannerTest {
     }
 
 }
-
-
-```
