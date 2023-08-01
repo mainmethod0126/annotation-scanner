@@ -1,0 +1,28 @@
+parameters:
+  - name: jdk_version
+    type: string
+    default: "15"
+  - name: jdk_file
+    type: string
+    default: "./builds/openjdk-15.0.0_linux-x64_bin.tar.gz"
+  - name: curl_download_jdk
+    type: string
+    default: "https://cdn.azul.com/zulu/bin/zulu15.34.17-ca-jdk15.0.4-linux_x64.tar.gz > ./builds/openjdk-15.0.0_linux-x64_bin.tar.gz"
+
+steps:
+  - bash: |
+      mkdir -p ./builds/binaries/externals
+    displayName: create jdk directory
+
+  - bash: |
+      curl ${{ parameters.curl_download_jdk }}
+    displayName: download jdk ${{ parameters.jdk_version }}
+
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: ${{ parameters.jdk_version }}
+      jdkArchitectureOption: x64
+      jdkSourceOption: LocalDirectory
+      jdkFile: ${{ parameters.jdk_file }}
+      jdkDestinationDirectory: "./builds/binaries/externals"
+      cleanDestinationDirectory: true

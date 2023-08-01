@@ -1,0 +1,43 @@
+parameters:
+  - name: jdk_version
+    type: string
+    default: "15"
+  - name: major
+    type: string
+    default: ""
+  - name: minor
+    type: string
+    default: ""
+  - name: patch
+    type: string
+    default: ""
+
+steps:
+  - bash: |
+      chmod -R 777 "$(Build.SourcesDirectory)"
+    displayName: change folder permissions
+  
+  - task: Gradle@2
+    inputs:
+      workingDirectory: '$(Build.SourcesDirectory)'
+      gradleWrapperFile: 'gradlew'
+      gradleOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      # azure에서 gradle jdk version은 최대 java 11까지입니다..
+      # jdkVersionOption: ${{ parameters.jdk_version }} 
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: false
+      testResultsFiles: '**/TEST-*.xml'
+      tasks: 'build'
+      options: '-Pmajor="${{ parameters.major }}" -Pminor="${{ parameters.minor }}" -Ppatch="${{ parameters.patch }}" -Pjavav="${{ parameters.jdk_version }}" -Pbm="jdk${{ parameters.jdk_version }}"'
+
+  - bash: |
+      mkdir $(Pipeline.Workspace)/temp
+      ls $(Pipeline.Workspace) | grep temp
+    displayName: create temp dir
+
+  - bash: |
+      cp ./version.json $(Pipeline.Workspace)/temp/version.json 
+      ls $(Pipeline.Workspace)/temp | grep version.json
+    displayName: copy version.json
+
