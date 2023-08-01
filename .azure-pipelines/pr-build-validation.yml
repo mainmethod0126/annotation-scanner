@@ -1,0 +1,89 @@
+trigger:
+  - none
+
+pool:
+  # 빌드 검증 테스트 
+  name: VM
+  demands:
+    - Agent.Name -equals Ubuntu 20.04
+    - Agent.OS -equals Linux
+    - Agent.OSArchitecture -equals X64
+
+jobs:
+  - job: jdk15
+    variables:
+      - name: jdk_version
+        value: "15"
+      - name: jdk_file
+        value: "./builds/openjdk-15.0.0_linux-x64_bin.tar.gz"
+      - name: curl_download_jdk
+        value: "https://cdn.azul.com/zulu/bin/zulu15.34.17-ca-jdk15.0.4-linux_x64.tar.gz > ./builds/openjdk-15.0.0_linux-x64_bin.tar.gz"
+
+    steps:
+      - template: ./templates/java-install.yml
+        parameters:
+          jdk_version: "$(jdk_version)"
+          jdk_file: "$(jdk_file)"
+          curl_download_jdk: "$(curl_download_jdk)"
+
+      - template: ./templates/build.yml
+        parameters:
+          jdk_version: "$(jdk_version)"
+          patch: "++"
+
+      - template: ./templates/publish-build-artifacts.yml
+        parameters:
+          contests: "dist/**"
+          artifactName: "annotation-scanner"
+
+  - job: jdk14
+    variables:
+      - name: jdk_version
+        value: "14"
+      - name: jdk_file
+        value: "./builds/openjdk-14.0.2_linux-x64_bin.tar.gz"
+      - name: curl_download_jdk
+        value: "https://cdn.azul.com/zulu/bin/zulu14.29.23-ca-jdk14.0.2-linux_x64.tar.gz > ./builds/openjdk-14.0.2_linux-x64_bin.tar.gz"
+
+    steps:
+      - template: ./templates/java-install.yml
+        parameters:
+          jdk_version: "$(jdk_version)"
+          jdk_file: "$(jdk_file)"
+          curl_download_jdk: "$(curl_download_jdk)"
+
+      - template: ./templates/build.yml
+        parameters:
+          jdk_version: "$(jdk_version)"
+          patch: "++"
+      
+      - template: ./templates/publish-build-artifacts.yml
+        parameters:
+          contests: "dist/**"
+          artifactName: "annotation-scanner"
+
+  - job: jdk11
+    variables:
+      - name: jdk_version
+        value: "11"
+      - name: jdk_file
+        value: "./builds/openjdk-11.0.12_linux-x64_bin.tar.gz"
+      - name: curl_download_jdk
+        value: "https://cdn.azul.com/zulu/bin/zulu11.50.19-ca-jdk11.0.12-linux_x64.tar.gz > ./builds/openjdk-11.0.12_linux-x64_bin.tar.gz"
+
+    steps:
+      - template: ./templates/java-install.yml
+        parameters:
+          jdk_version: "$(jdk_version)"
+          jdk_file: "$(jdk_file)"
+          curl_download_jdk: "$(curl_download_jdk)"
+
+      - template: ./templates/build.yml
+        parameters:
+          jdk_version: "$(jdk_version)"
+          patch: "++"
+
+      - template: ./templates/publish-build-artifacts.yml
+        parameters:
+          contests: "dist/**"
+          artifactName: "annotation-scanner"

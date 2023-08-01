@@ -1,0 +1,64 @@
+parameters:
+  - name: git_email
+    type: string
+    default: "cb1-1@softcamp.co.kr"
+  - name: git_user_name
+    type: string
+    default: "Product Development Team 1"
+
+
+steps:
+  # version정보를 얻어오기위한 json 파싱을 편하게 하기 위하여 node 설치
+  - template: ./install-node.yml
+    parameters:
+      versionSpec: "14.x"
+
+  - checkout: self
+    persistCredentials: true
+
+  - bash: |
+      git config --global user.email "${{ parameters.git_email }}"
+      git config --global user.name "${{ parameters.git_user_name }}"
+    displayName: "set git user.email & user.name"
+
+  - bash: |
+      cd "$(Build.SourcesDirectory)"
+      pwd
+    displayName: "change working directory to $(Build.SourcesDirectory)"
+
+  - bash: |
+      cp $(Pipeline.Workspace)/temp/version.json $(Build.SourcesDirectory)/version.json
+    displayName: Get version.json
+
+  - bash: |
+      temp_major=`node -p "const p = require('$(Pipeline.Workspace)/temp/version.json'); p.major;"`
+      temp_minor=`node -p "const p = require('$(Pipeline.Workspace)/temp/version.json'); p.minor;"`
+      temp_patch=`node -p "const p = require('$(Pipeline.Workspace)/temp/version.json'); p.patch;"`
+      temp_prereleaseVersion=`node -p "const p = require('$(Pipeline.Workspace)/temp/version.json'); p.prereleaseVersion;"`
+      temp_buildMetadata=`node -p "const p = require('$(Pipeline.Workspace)/temp/version.json'); p.buildMetadata;"`
+
+      if [ "$temp_minor" != "" ]; then
+        temp_minor=".${temp_minor}"
+      fi
+
+      if [ "$temp_patch" != "" ]; then
+        temp_patch=".${temp_patch}"
+      fi
+
+      # 태깅정보에 metadata 는 들어갈 필요가 없을 것 이라고 판단하여 미포함합니다.
+
+      if [ "$temp_prereleaseVersion" != "" ]; then
+        temp_prereleaseVersion="-${temp_prereleaseVersion}"
+      fi
+
+      version="$temp_major$temp_minor$temp_patch$temp_prereleaseVersion"
+
+      echo "version = $version"
+      
+      git add version.json
+      git commit -a -m "***NO_CI***Azure Pipeline Auto Build : $version"
+      git push -u origin HEAD:main
+
+      git tag "$version"
+      git push -u origin HEAD:main "$version"
+    displayName: "tag creation and version change push"

@@ -1,0 +1,25 @@
+parameters:
+  - name: contests
+    type: string
+    default: "dist/**"
+  - name: artifactName
+    type: string
+    default: "annotation-scanner"
+
+steps: 
+- task: CopyFiles@2
+  inputs:
+    Contents: ${{ parameters.contests }}
+    TargetFolder: "$(Build.ArtifactStagingDirectory)"
+  displayName: "copy dist dir to artifactstagingdirectory"
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: "$(Build.artifactstagingdirectory)"
+    ArtifactName: ${{ parameters.artifactName }}
+  displayName: "publish artifact: ${{ parameters.artifactName }}"
+
+- bash: |
+    cd $(Build.artifactstagingdirectory)
+    echo $(Build.artifactstagingdirectory)
+  displayName: change current directory

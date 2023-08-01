@@ -1,0 +1,11 @@
+parameters:
+  - name: versionSpec
+    type: string
+    default:
+      - default
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: ${{ parameters.versionSpec }}
+    displayName: "install node.js"
