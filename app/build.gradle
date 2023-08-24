@@ -101,10 +101,10 @@ publishing {
 }
 
 
-// application {
-//     // Define the main class for the application.
-//     mainClass = 'io.github.mainmethod0126.annotation.scanner.App'
-// }
+application {
+    // Define the main class for the application.
+    mainClass = 'io.github.mainmethod0126.annotation.scanner.App'
+}
 
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
