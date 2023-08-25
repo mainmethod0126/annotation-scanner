@@ -3,6 +3,7 @@ package io.github.mainmethod0126.annotation.scanner;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AnnotationScanner {
@@ -43,7 +44,7 @@ public class AnnotationScanner {
 
     private void scanClass(File rootDir, String namespace,
             Class<? extends Annotation> annotationClass) throws ClassNotFoundException {
-
+        String annotationClassName = annotationClass.getName();
         File[] files = rootDir.listFiles();
 
         if (files == null) {
@@ -68,9 +69,22 @@ public class AnnotationScanner {
                 // We dynamically load the class.
                 Class<?> loadedClass = Class.forName(className);
 
-                if (loadedClass.isAnnotationPresent(annotationClass)) {
-                    // We add the loaded class to the list to be returned.
-                    classes.add(loadedClass);
+                /*
+                 * Due to the phenomenon of loading a class using the class loader of the method
+                 * that invoked "Class.forName()," when the class loaders for "annotationClass"
+                 * and the class loader for "AnnotationScanner" are different, a situation can
+                 * arise where, within the "loadedClass.isAnnotationPresent(annotationClass)"
+                 * internal function, a comparison of annotation classes is performed. Since the
+                 * key in the HashMap is the class and the comparison is based on the key, if
+                 * the class loaders are different, even if two classes that are the subjects of
+                 * comparison are actually the same class files, they can be incorrectly
+                 * identified as different classes, leading to unexpected behavior. Therefore,
+                 * the comparison method has been changed to a simple name comparison.
+                 */
+                for (var annotation : Arrays.asList(loadedClass.getDeclaredAnnotations())) {
+                    if (annotationClassName.equals(annotation.annotationType().getName())) {
+                        classes.add(loadedClass);
+                    }
                 }
             }
         }
