@@ -3,7 +3,6 @@ package io.github.mainmethod0126.annotation.scanner;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class AnnotationScanner {
@@ -21,11 +20,34 @@ public class AnnotationScanner {
      * classes containing the specified annotation within the given
      * 'rootPackageName' and its subpackages.
      * 
+     * Note: This function does not take a class loader as a parameter; instead, it
+     * uses the class loader of the provided annotationClass by default. If you wish
+     * to specify a class loader, please use the scanClass function that accepts
+     * classLoader as an argument.
+     * 
      * @param annotationClass
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public List<Class<?>> scanClass(Class<? extends Annotation> annotationClass)
+            throws ClassNotFoundException {
+        return scanClass(annotationClass, annotationClass.getClassLoader());
+    }
+
+    /**
+     * Receives a parameter of type 'Class<? extends Annotation>' and searches for
+     * classes containing the specified annotation within the given
+     * 'rootPackageName' and its subpackages.
+     * 
+     * @param annotationClass
+     * @param classLoader     Since an unintended selection of a different class
+     *                        loader can lead to recognizing the same class file as
+     *                        a different class, we specify the class loader.
      * @return The list of classes using annotations
      * @throws ClassNotFoundException
      */
-    public List<Class<?>> scanClass(Class<? extends Annotation> annotationClass) throws ClassNotFoundException {
+    public List<Class<?>> scanClass(Class<? extends Annotation> annotationClass, ClassLoader classLoader)
+            throws ClassNotFoundException {
 
         this.classes.clear();
 
@@ -36,15 +58,14 @@ public class AnnotationScanner {
         String packagePath = packageToPath(this.rootPackageName);
 
         for (String classpathEntry : classpathEntries) {
-            scanClass(new File(classpathEntry, packagePath), pathToPackage(packagePath), annotationClass);
+            scanClass(new File(classpathEntry, packagePath), pathToPackage(packagePath), annotationClass, classLoader);
         }
 
         return classes;
     }
 
     private void scanClass(File rootDir, String namespace,
-            Class<? extends Annotation> annotationClass) throws ClassNotFoundException {
-        String annotationClassName = annotationClass.getName();
+            Class<? extends Annotation> annotationClass, ClassLoader classLoader) throws ClassNotFoundException {
         File[] files = rootDir.listFiles();
 
         if (files == null) {
@@ -54,7 +75,7 @@ public class AnnotationScanner {
         for (File file : files) {
 
             if (file.isDirectory()) {
-                scanClass(file, namespace.replace('/', '.') + "." + file.getName(), annotationClass);
+                scanClass(file, namespace.replace('/', '.') + "." + file.getName(), annotationClass, classLoader);
             } else {
 
                 if (!file.getName().endsWith(".class")) {
@@ -66,26 +87,21 @@ public class AnnotationScanner {
                 String className = namespace + "."
                         + file.getName().replaceAll(".class$", "");
 
-                // We dynamically load the class.
-                Class<?> loadedClass = Class.forName(className);
-
                 /*
-                 * Due to the phenomenon of loading a class using the class loader of the method
-                 * that invoked "Class.forName()," when the class loaders for "annotationClass"
-                 * and the class loader for "AnnotationScanner" are different, a situation can
-                 * arise where, within the "loadedClass.isAnnotationPresent(annotationClass)"
-                 * internal function, a comparison of annotation classes is performed. Since the
-                 * key in the HashMap is the class and the comparison is based on the key, if
-                 * the class loaders are different, even if two classes that are the subjects of
-                 * comparison are actually the same class files, they can be incorrectly
-                 * identified as different classes, leading to unexpected behavior. Therefore,
-                 * the comparison method has been changed to a simple name comparison.
+                 * If classLoader is not specified, the class loader of the method that invoked
+                 * forName() is used, which can inadvertently result in the use of different
+                 * class loaders. As a result, the same class file can be mistakenly identified
+                 * as different classes. Therefore, to address this issue, we have made it
+                 * explicit to specify the class loader, ensuring a clear choice of which class
+                 * loader is used to load the class.
                  */
-                for (var annotation : Arrays.asList(loadedClass.getDeclaredAnnotations())) {
-                    if (annotationClassName.equals(annotation.annotationType().getName())) {
-                        classes.add(loadedClass);
-                    }
+                Class<?> loadedClass = Class.forName(className, true, classLoader);
+
+                if (loadedClass.isAnnotationPresent(annotationClass)) {
+                    // We add the loaded class to the list to be returned.
+                    classes.add(loadedClass);
                 }
+
             }
         }
     }
