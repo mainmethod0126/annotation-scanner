@@ -15,6 +15,12 @@
 
 It's a service that helps find specific annotations used in a project.
 
+
+## Reason for production
+
+I encountered a situation in a Java project where I needed to find classes that are using a specific annotation. I thought creating a simple feature similar to Spring Framework's component scanner could be very useful in many cases, so I decided to give it a try.
+
+
 ---
 
 ## Usage
