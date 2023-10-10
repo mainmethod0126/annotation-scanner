@@ -14,9 +14,9 @@ buildscript {
 
 
 plugins {
-    // Apply the application plugin to add support for building a CLI application in Java.
-    id 'application'
+    id 'java-library'
     id 'maven-publish'
+    id 'signing'
 }
 
 
@@ -38,6 +38,17 @@ dependencies {
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.24.2'
 
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
 
 publishing {
@@ -70,6 +81,7 @@ publishing {
 		}
     }
 
+
     publications {
         mavenJava(MavenPublication) { 
             from components.java
@@ -83,8 +95,28 @@ publishing {
             
             
             pom {
-                name = 'My Library'
-                description = 'A description of my library'
+                name = 'annotation-scanner'
+                description = 'It\'s a service that helps find specific annotations used in a project'
+                url = 'https://github.com/mainmethod0126/annotation-scanner'
+
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://github.com/mainmethod0126/annotation-scanner/blob/main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'mainmethod0126'
+                        name = 'Shin Woosub'
+                        email = 'mainmethod0126@gmail.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/mainmethod0126/annotation-scanner.git'
+                    developerConnection = 'scm:git:ssh://github.com:mainmethod0126/annotation-scanner.git'
+                    url = 'https://github.com/mainmethod0126/annotation-scanner'
+                }
             }
         }
     }
@@ -100,11 +132,10 @@ publishing {
     }
 }
 
-
-application {
-    // Define the main class for the application.
-    mainClass = 'io.github.mainmethod0126.annotation.scanner.App'
+signing {
+    sign publishing.publications.mavenJava
 }
+
 
 tasks.named('test') {
     // Use JUnit Platform for unit tests.
