@@ -5,18 +5,27 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The AnnotationScanner class provides functionality for scanning classes
+ * within a specified package and its subpackages to find those containing a
+ * specific annotation.
+ */
 public class AnnotationScanner {
 
     // Specifies the top-level package or namespace name to search for classes.
     private String rootPackageName;
     private List<Class<?>> classes = new ArrayList<>();
 
+    /**
+     * Constructs an AnnotationScanner with the specified root package name.
+     * @param rootPackageName The top-level package or namespace name to search for classes.
+     */
     public AnnotationScanner(String rootPackageName) {
         this.rootPackageName = rootPackageName;
     }
 
     /**
-     * Receives a parameter of type 'Class<? extends Annotation>' and searches for
+     * Receives a parameter of type {@code Class<? extends Annotation>} and searches for
      * classes containing the specified annotation within the given
      * 'rootPackageName' and its subpackages.
      * 
@@ -25,9 +34,9 @@ public class AnnotationScanner {
      * to specify a class loader, please use the scanClass function that accepts
      * classLoader as an argument.
      * 
-     * @param annotationClass
-     * @return
-     * @throws ClassNotFoundException
+     * @param annotationClass Class type of the desired annotation
+     * @return Classes that use the received annotation type as an argument
+     * @throws ClassNotFoundException If the class fails to load, an exception is thrown
      */
     public List<Class<?>> scanClass(Class<? extends Annotation> annotationClass)
             throws ClassNotFoundException {
@@ -35,16 +44,16 @@ public class AnnotationScanner {
     }
 
     /**
-     * Receives a parameter of type 'Class<? extends Annotation>' and searches for
+     * Receives a parameter of type {@code Class<? extends Annotation>} and searches for
      * classes containing the specified annotation within the given
      * 'rootPackageName' and its subpackages.
      * 
-     * @param annotationClass
+     * @param annotationClass Class type of the desired annotation
      * @param classLoader     Since an unintended selection of a different class
      *                        loader can lead to recognizing the same class file as
      *                        a different class, we specify the class loader.
      * @return The list of classes using annotations
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException If the class fails to load, an exception is thrown
      */
     public List<Class<?>> scanClass(Class<? extends Annotation> annotationClass, ClassLoader classLoader)
             throws ClassNotFoundException {
