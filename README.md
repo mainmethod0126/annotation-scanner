@@ -29,6 +29,8 @@ I encountered a situation in a Java project where I needed to find classes that 
 
 ### Add dependency
 
+[Go to 🚀 maven central repository](https://central.sonatype.com/artifact/io.github.mainmethod0126/annotation-scanner/0.0.4)
+
 #### for Gradle
 
 ```groovy
