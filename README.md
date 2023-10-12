@@ -5,7 +5,7 @@
   - [Usage](#usage)
     - [Add dependency](#add-dependency)
       - [for Gradle](#for-gradle)
-    - [for Maven](#for-maven)
+      - [for Maven](#for-maven)
     - [Example](#example)
       - [Default class loader](#default-class-loader)
       - [Select class loader](#select-class-loader)
@@ -45,7 +45,7 @@ implementation 'io.github.mainmethod0126:annotation-scanner:0.0.4'
 implementation("io.github.mainmethod0126:annotation-scanner:0.0.4")
 ```
 
-### for Maven
+#### for Maven
 
 ```xml
 <dependency>
