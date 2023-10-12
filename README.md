@@ -1,7 +1,11 @@
 <!-- TOC -->
 
 - [annotation-scanner](#annotation-scanner)
+  - [Reason for production](#reason-for-production)
   - [Usage](#usage)
+    - [Add dependency](#add-dependency)
+      - [for Gradle](#for-gradle)
+    - [for Maven](#for-maven)
     - [Example](#example)
       - [Default class loader](#default-class-loader)
       - [Select class loader](#select-class-loader)
@@ -15,15 +19,41 @@
 
 It's a service that helps find specific annotations used in a project.
 
-
 ## Reason for production
 
 I encountered a situation in a Java project where I needed to find classes that are using a specific annotation. I thought creating a simple feature similar to Spring Framework's component scanner could be very useful in many cases, so I decided to give it a try.
 
-
 ---
 
 ## Usage
+
+### Add dependency
+
+#### for Gradle
+
+```groovy
+implementation group: 'io.github.mainmethod0126', name: 'annotation-scanner', version: '0.0.4'
+```
+
+- short
+```groovy
+implementation 'io.github.mainmethod0126:annotation-scanner:0.0.4'
+```
+
+- kotlin
+```kotlin
+implementation("io.github.mainmethod0126:annotation-scanner:0.0.4")
+```
+
+### for Maven
+
+```xml
+<dependency>
+    <groupId>io.github.mainmethod0126</groupId>
+    <artifactId>annotation-scanner</artifactId>
+    <version>0.0.4</version>
+</dependency>
+```
 
 ### Example
 
